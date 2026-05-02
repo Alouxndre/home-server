@@ -1,0 +1,35 @@
+
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+
+homeassistant:
+  external_url: 'https://funhome.eggorkiwi.eu:10520'
+  # internal_url: 'https://my.domain.com:8123'
+
+# Enable SSL and set port to 443
+http:
+  server_port: 443
+  ssl_certificate: /config/tts/fullchain1.pem
+  ssl_key: /config/tts/privkey1.pem
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+light:
+  - platform: group
+    name: Ljus Vardagsrum
+    unique_id: ljus_vardagsrum_group
+    entities:
+      - light.0x08fd52fffe4bccc6
+      - light.0x08fd52fffe3357fe
+
+input_boolean:
+  motion_lights_active:
+    name: Motion Lights Active
+    initial: off

@@ -1,0 +1,137 @@
+- id: motion_triggered_lights
+  alias: Motion detected - turn on lights
+  description: Turn on lights when motion is detected (sunset to sunrise, resets on continuous motion)
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.0x00124b0029323c35_occupancy
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: light.ljus_vardagsrum
+    state: 'off'
+  - condition: sun
+    after: sunset
+    before: sunrise
+  action:
+  - service: light.turn_on
+    target:
+      entity_id: light.ljus_vardagsrum
+    data:
+      brightness: 127
+
+
+- id: motion_lights_timeout
+  alias: Turn off lights after 5 minutes of no motion
+  description: Turn off lights if no motion detected for 5 minutes (only if motion triggered them)
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.0x00124b0029323c35_occupancy
+    to: 'off'
+    for:
+      minutes: 3
+  condition:
+  - condition: state
+    entity_id: input_boolean.motion_lights_active
+    state: 'off'
+  action:
+  - service: light.turn_off
+    target:
+      entity_id: light.ljus_vardagsrum
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.motion_lights_active
+
+- id: motion_lights_timeout_tv
+  alias: Turn off lights after 5 minutes of no motion
+  description: Turn off lights if no motion detected for 5 minutes (only if motion triggered them)
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.0x00124b0029323c35_occupancy
+    to: 'off'
+    for:
+      minutes: 3
+  condition:
+  - condition: state
+    entity_id: input_boolean.motion_lights_active
+    state: 'on'
+  action:
+  - service: light.turn_on
+    target:
+      entity_id: 
+        - light.ljus_vardagsrum
+    data:
+      brightness: 76
+
+- id: manual_light_control_reset
+  alias: Reset motion lights flag on manual control
+  description: Reset the motion lights flag when lights are manually controlled
+  trigger:
+  - platform: state
+    entity_id: light.ljus_vardagsrum
+    to: 'off'
+  condition:
+  - condition: state
+    entity_id: input_boolean.motion_lights_active
+    state: 'on'
+  action:
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.motion_lights_active
+
+- id: tv_on_lights_night
+  alias: TV on - turn on lights at 30%
+  description: Turn on lights at 30% brightness when TV is on (sunset to sunrise)
+  trigger:
+  - platform: state
+    entity_id: media_player.samsung_q65aa_65_tv_qe65q65aauxxc
+    to: 'on'
+  condition:
+  - condition: sun
+    after: sunset
+    before: sunrise
+  action:
+  - service: light.turn_on
+    target:
+      entity_id: 
+        - light.ljus_vardagsrum
+    data:
+      brightness: 76
+  - service: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.motion_lights_active
+
+- id: tv_off_lights_night
+  alias: TV off - turn off lights
+  description: Turn off lights when TV is turned off
+  trigger:
+  - platform: state
+    entity_id: media_player.samsung_q65aa_65_tv_qe65q65aauxxc
+    to: 'off'
+    for:
+      minutes: 5
+  action:
+  - service: light.turn_off
+    target:
+        entity_id: 
+          - light.ljus_vardagsrum
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.motion_lights_active
+
+- id: '1765123266051'
+  alias: Styrbar Remote Control for Lights (2025-09-17)fönster
+  description: ''
+  use_blueprint:
+    path: droidgren/styrbar_light_remote_control.yaml
+    input:
+      light_entity: light.0x08fd52fffe4bccc6
+      mqtt_device: ea0235750f1d8a6dca3afd160a2ee557
+
+- id: '1765123315977'
+  alias: Styrbar Remote Control for Lights (2025-09-17)skrivbordet
+  description: ''
+  use_blueprint:
+    path: droidgren/styrbar_light_remote_control.yaml
+    input:
+      light_entity: light.0x08fd52fffe3357fe
+      mqtt_device: ea0235750f1d8a6dca3afd160a2ee557

@@ -1,0 +1,41 @@
+# Runtime logs and transient data
+*.log
+*.log.*
+*.fault
+*.backup
+
+# Home Assistant runtime state
+/config/.storage/
+/config/backups/
+/config/deps/
+/config/tts/
+/config/.HA_VERSION
+/config/.ha_run.lock
+/config/home-assistant.log*
+/config/*.db
+/config/*.db-*
+/config/secrets.yaml
+
+# Certbot credentials, certificates, and logs
+/certbot/www/
+/certbot/log/
+/certbot/conf/accounts/
+/certbot/conf/archive/
+/certbot/conf/live/
+/certbot/conf/renewal/*.conf
+/certbot/conf/ovh.ini
+
+# Mosquitto runtime data
+/mosquitto/data/
+/mosquitto/log/
+
+# Music Assistant state
+/music-assistant-server/data/
+
+# Zigbee2MQTT secrets and runtime state
+/zigbee2mqtt/configuration.yaml
+/zigbee2mqtt/*.db
+/zigbee2mqtt/*.db-*
+/zigbee2mqtt/coordinator_backup.json
+/zigbee2mqtt/state.json
+/zigbee2mqtt/log/

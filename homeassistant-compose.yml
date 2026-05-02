@@ -1,0 +1,96 @@
+
+networks:
+  local_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/24
+
+services:
+  homeassistant:
+    # container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    environment:
+      - DISABLE_JEMALLOC=true
+    volumes:
+      - /srv/homeassistant/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    # networks:
+    #   local_network:
+    #     ipv4_address: 172.20.0.2
+  music-assistant-server:
+    image: ghcr.io/music-assistant/server:latest # <<< Desired release version here (or use beta to get the latest beta version)
+    # container_name: music-assistant-server
+    restart: unless-stopped
+    # Network mode must be set to host for MA to work correctly
+    network_mode: host
+    volumes:
+      - /srv/homeassistant/music-assistant-server/data:/data/
+    # privileged caps (and security-opt) needed to mount smb folders within the container
+    cap_add:
+      - SYS_ADMIN
+      - DAC_READ_SEARCH
+    security_opt:
+      - apparmor:unconfined
+    environment:
+      # Provide logging level as environment variable.
+      # default=info, possible=(critical, error, warning, info, debug)
+      # --webroot --webroot-path=/var/www/certbot
+      - LOG_LEVEL=info
+  certbot:
+    image: certbot/dns-ovh:latest
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt:rw
+      - ./certbot/log/letsencrypt:/var/log/letsencrypt:rw
+    entrypoint: []
+    command:
+      - /bin/sh
+      - -c
+      - |
+        pip install certbot-dns-ovh &&
+        certbot certonly \
+          --dns-ovh \
+          --dns-ovh-credentials /etc/letsencrypt/ovh.ini \
+          --dns-ovh-propagation-seconds 120 \
+          -d funhome.eggorkiwi.eu
+  zigbee2mqtt:
+    # container_name: zigbee2mqtt
+    image: koenkk/zigbee2mqtt:latest
+    restart: unless-stopped
+    volumes:
+      - ./zigbee2mqtt:/app/data
+      - /run/udev:/run/udev:ro
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    # Network mode must be set to host for MA to work correctly
+    network_mode: host
+    # ports:
+    #   # Frontend port
+    #   - 8080:8080
+    environment:
+      - TZ=Europe/Amsterdam
+  mqtt:
+    image: eclipse-mosquitto:2.0.22
+    restart: unless-stopped
+    volumes:
+      - "./mosquitto:/mosquitto"
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    command: "mosquitto -c /mosquitto-no-auth.conf"
+  # mcp_hass:
+  #   container_name: mcp_hass
+  #   image: voska/hass-mcp:latest
+  #   restart: unless-stopped
+  #   network_mode: host
+  #   volumes:
+  #     - /srv/homeassistant/mcp-hass/config:/config
+  #     - /etc/localtime:/etc/localtime:ro
+  #   environment:
+  #     - TZ=Europe/Stockholm
+

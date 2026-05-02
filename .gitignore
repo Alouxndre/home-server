@@ -36,6 +36,10 @@
 /zigbee2mqtt/configuration.yaml
 /zigbee2mqtt/*.db
 /zigbee2mqtt/*.db-*
+/zigbee2mqtt/configuration_backup_v*.yaml
 /zigbee2mqtt/coordinator_backup.json
 /zigbee2mqtt/state.json
 /zigbee2mqtt/log/
+
+# Local environment secrets
+/.env

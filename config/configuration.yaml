@@ -9,13 +9,14 @@ frontend:
 
 homeassistant:
   external_url: 'https://funhome.eggorkiwi.eu:10520'
-  # internal_url: 'https://my.domain.com:8123'
+  internal_url: 'http://192.168.15.107:8123'
 
-# Enable SSL and set port to 443
+# Internal HTTP only
 http:
-  server_port: 443
-  ssl_certificate: /config/tts/fullchain1.pem
-  ssl_key: /config/tts/privkey1.pem
+  server_port: 8123
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.20.0.3
 
 automation: !include automations.yaml
 script: !include scripts.yaml

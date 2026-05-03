@@ -84,10 +84,13 @@ services:
     devices:
       - "/dev/ttyUSB0:/dev/ttyUSB0"
     # Network mode must be set to host for MA to work correctly
-    network_mode: host
-    # ports:
-    #   # Frontend port
-    #   - 8080:8080
+    # network_mode: host
+    networks:
+      local_network:
+        ipv4_address: 172.20.0.4
+    ports:
+      # Frontend port
+      - 8080:8080
     environment:
       - TZ=Europe/Amsterdam
   mqtt:
@@ -98,6 +101,9 @@ services:
     ports:
       - "1883:1883"
       - "9001:9001"
+    networks:
+      local_network:
+        ipv4_address: 172.20.0.5
     command: "mosquitto -c /mosquitto-no-auth.conf"
   mcp_hass:
     container_name: mcp_hass
